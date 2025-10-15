@@ -53,8 +53,8 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker tag fusionpact-frontend $DOCKER_USERNAME/fusionpact-frontend:latest
-          docker tag fusionpact-backend $DOCKER_USERNAME/fusionpact-backend:latest
-          docker push $DOCKER_USERNAME/fusionpact-frontend:latest
-          docker push $DOCKER_USERNAME/fusionpact-backend:latest
+          docker tag fusionpact-frontendhesam009/fusionpact-frontend:latest
+          docker tag fusionpact-backend $hesam009/fusionpact-backend:latest
+          docker push hesam009/fusionpact-frontend:latest
+          docker push hesam009/fusionpact-backend:latest
 
