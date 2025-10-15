@@ -1,4 +1,4 @@
-name: Build and Test (Docker + Node.js)
+name: Build, Test, and Push Docker Images
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-test:
+  build-test-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,33 +28,36 @@ jobs:
         run: |
           cd backend
           npm install
-          npm test || echo "No test script found"
+          npm test || echo "No backend test script found"
 
       # Step 4: Install dependencies and test frontend
       - name: Install and test frontend
         run: |
           cd frontend
           npm install
-          npm test || echo "No test script found"
+          npm test || echo "No frontend test script found"
 
       # Step 5: Build Docker images
       - name: Build Docker images
         run: |
           docker compose build
 
-      # Step 6: List images (for verification)
-      - name: Verify Docker images
-        run: docker images
-      # Step 7: Login & push to Docker Hub
-      - name: Push Docker images to Docker Hub
-        if: github.ref == 'refs/heads/main'
+      # Step 6: Login to Docker Hub
+      - name: Docker Hub Login
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker tag fusionpact-frontendhesam009/fusionpact-frontend:latest
-          docker tag fusionpact-backend $hesam009/fusionpact-backend:latest
-          docker push hesam009/fusionpact-frontend:latest
-          docker push hesam009/fusionpact-backend:latest
 
+      # Step 7: Tag and Push images
+      - name: Push Docker images to Docker Hub
+        run: |
+          docker tag fusionpact-devops-challenge-frontend ${{ secrets.DOCKER_USERNAME }}/fusionpact-frontend:latest
+          docker tag fusionpact-devops-challenge-backend ${{ secrets.DOCKER_USERNAME }}/fusionpact-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/fusionpact-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/fusionpact-backend:latest
+
+      # Step 8: Verify pushed images
+      - name: Confirm Docker push
+        run: docker images
